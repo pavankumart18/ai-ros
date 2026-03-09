@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bridging Language & Machines — An LLM-to-Robot Pipeline</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a2e;
+    --paper: #faf9f6;
+    --accent: #c0392b;
+    --accent2: #2c3e50;
+    --success: #1a8754;
+    --fail: #c0392b;
+    --muted: #7f8c8d;
+    --border: #ddd;
+    --code-bg: #f4f1eb;
+    --highlight: #fef3cd;
+    --blue: #2980b9;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Source Sans 3', Georgia, serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.7;
+    font-size: 18px;
+  }
+
+  /* === HERO === */
+  .hero {
+    min-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 4rem 2rem;
+    background: linear-gradient(170deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%);
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: 
+      radial-gradient(circle at 20% 50%, rgba(192,57,43,0.08) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(41,128,185,0.08) 0%, transparent 50%),
+      radial-gradient(circle at 50% 80%, rgba(26,135,84,0.06) 0%, transparent 50%);
+    animation: drift 20s ease-in-out infinite;
+  }
+
+  @keyframes drift {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(-2%, 1%); }
+  }
+
+  .hero-label {
+    font-family: 'Source Sans 3', sans-serif;
+    font-weight: 600;
+    font-size: 0.75rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.8rem, 6vw, 5rem);
+    font-weight: 700;
+    line-height: 1.1;
+    max-width: 900px;
+    position: relative;
+    z-index: 1;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-sub {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 300;
+    color: rgba(255,255,255,0.7);
+    max-width: 650px;
+    position: relative;
+    z-index: 1;
+    line-height: 1.6;
+  }
+
+  .hero-meta {
+    margin-top: 3rem;
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.4);
+    position: relative;
+    z-index: 1;
+    letter-spacing: 1px;
+  }
+
+  /* === CONTENT === */
+  .content {
+    max-width: 740px;
+    margin: 0 auto;
+    padding: 4rem 2rem;
+  }
+
+  .content p {
+    margin-bottom: 1.5rem;
+    font-size: 1.125rem;
+    color: #2c2c2c;
+  }
+
+  .content h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-top: 4rem;
+    margin-bottom: 1.5rem;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+
+  .content h3 {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--accent2);
+  }
+
+  .dropcap::first-letter {
+    font-family: 'Playfair Display', serif;
+    float: left;
+    font-size: 4.5rem;
+    line-height: 0.8;
+    padding-right: 0.6rem;
+    padding-top: 0.2rem;
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  /* === PULL QUOTE === */
+  .pull-quote {
+    border-left: 4px solid var(--accent);
+    padding: 1.5rem 0 1.5rem 2rem;
+    margin: 3rem 0;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-style: italic;
+    line-height: 1.4;
+    color: var(--accent2);
+  }
+
+  /* === STAT CARDS === */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin: 3rem 0;
+  }
+
+  .stat-card {
+    text-align: center;
+    padding: 2rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    background: #fff;
+  }
+
+  .stat-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    margin-top: 0.5rem;
+  }
+
+  /* === PIPELINE === */
+  .pipeline {
+    margin: 3rem 0;
+    padding: 2.5rem;
+    background: #fff;
+    border: 1px solid var(--border);
+  }
+
+  .pipeline-title {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--muted);
+    margin-bottom: 2rem;
+  }
+
+  .pipeline-flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .pipeline-node {
+    padding: 0.75rem 1.25rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+
+  .node-llm { background: #e8d5f5; color: #6c3483; }
+  .node-mcp { background: #fdebd0; color: #b7950b; }
+  .node-ros { background: #d5f5e3; color: #1a8754; }
+  .node-sim { background: #d6eaf8; color: #2471a3; }
+
+  .pipeline-arrow {
+    font-size: 1.2rem;
+    color: var(--muted);
+  }
+
+  /* === TIMELINE === */
+  .timeline {
+    margin: 3rem 0;
+    position: relative;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 20px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--border);
+  }
+
+  .timeline-item {
+    position: relative;
+    padding-left: 55px;
+    margin-bottom: 2.5rem;
+  }
+
+  .timeline-dot {
+    position: absolute;
+    left: 12px;
+    top: 4px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 3px solid;
+  }
+
+  .dot-success { border-color: var(--success); background: #d5f5e3; }
+  .dot-fail { border-color: var(--fail); background: #fadbd8; }
+  .dot-partial { border-color: #f39c12; background: #fef9e7; }
+
+  .timeline-title {
+    font-family: 'Source Sans 3', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .timeline-detail {
+    font-size: 0.95rem;
+    color: #555;
+    line-height: 1.6;
+  }
+
+  .timeline-cmd {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    background: var(--code-bg);
+    padding: 0.6rem 1rem;
+    margin-top: 0.5rem;
+    border-radius: 3px;
+    overflow-x: auto;
+    display: block;
+    color: #444;
+    border-left: 3px solid var(--blue);
+  }
+
+  /* === STATUS TABLE === */
+  .status-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 2rem 0;
+    font-size: 0.95rem;
+  }
+
+  .status-table th {
+    font-family: 'Source Sans 3', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-align: left;
+    padding: 0.75rem 1rem;
+    border-bottom: 2px solid var(--ink);
+  }
+
+  .status-table td {
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid #eee;
+    vertical-align: top;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 0.2rem 0.65rem;
+    border-radius: 2px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .badge-success { background: #d5f5e3; color: var(--success); }
+  .badge-fail { background: #fadbd8; color: var(--fail); }
+  .badge-partial { background: #fef9e7; color: #b7950b; }
+
+  /* === CODE BLOCK === */
+  .code-block {
+    background: #1a1a2e;
+    color: #e0e0e0;
+    padding: 1.5rem;
+    border-radius: 3px;
+    margin: 1.5rem 0;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    line-height: 1.7;
+  }
+
+  .code-block .comment { color: #6a9955; }
+  .code-block .cmd { color: #dcdcaa; }
+
+  .phase-video {
+    width: 100%;
+    margin: 0.75rem 0 1rem;
+    border: 1px solid var(--border);
+    background: #000;
+    display: block;
+  }
+
+  /* === SECTION BREAK === */
+  .section-break {
+    text-align: center;
+    margin: 4rem 0;
+    color: var(--muted);
+    font-size: 1.5rem;
+    letter-spacing: 12px;
+  }
+
+  /* === CONSTRAINT BOX === */
+  .constraint-box {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--fail);
+    padding: 1.5rem 2rem;
+    margin: 2rem 0;
+  }
+
+  .constraint-box h4 {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--fail);
+    margin-bottom: 0.75rem;
+  }
+
+  .constraint-box ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .constraint-box li {
+    padding: 0.4rem 0;
+    font-size: 0.95rem;
+    color: #555;
+    padding-left: 1.2rem;
+    position: relative;
+  }
+
+  .constraint-box li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--fail);
+  }
+
+  /* === POSSIBILITY BOX === */
+  .possibility-box {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--success);
+    padding: 1.5rem 2rem;
+    margin: 2rem 0;
+  }
+
+  .possibility-box h4 {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--success);
+    margin-bottom: 0.75rem;
+  }
+
+  .possibility-box li {
+    padding: 0.4rem 0;
+    font-size: 0.95rem;
+    color: #555;
+    padding-left: 1.2rem;
+    position: relative;
+    list-style: none;
+  }
+
+  .possibility-box li::before {
+    content: '+';
+    position: absolute;
+    left: 0;
+    color: var(--success);
+    font-weight: 700;
+  }
+
+  /* === FOOTER === */
+  .footer {
+    text-align: center;
+    padding: 4rem 2rem;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+
+  /* === WIDE SECTION === */
+  .wide {
+    max-width: 960px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 2rem;
+  }
+
+  /* === RESPONSIVE === */
+  @media (max-width: 700px) {
+    .stats-row { grid-template-columns: 1fr; }
+    .pipeline-flow { flex-direction: column; }
+    .pipeline-arrow { transform: rotate(90deg); }
+    .content { padding: 2rem 1.25rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== HERO ==================== -->
+<section class="hero">
+  <div class="hero-label">Technical Exploration Report</div>
+  <h1>Bridging Language<br>& Machines</h1>
+  <p class="hero-sub">
+    An end-to-end experiment connecting Large Language Models to robotic simulators 
+    through the Model Context Protocol — what worked, what broke, and what it unlocks.
+  </p>
+  <div class="hero-meta">Pavan Kumar &nbsp;·&nbsp; March 2026 &nbsp;·&nbsp; Ubuntu 24.04 &nbsp;·&nbsp; HP ZBook Power G11</div>
+</section>
+
+<!-- ==================== EXECUTIVE SUMMARY ==================== -->
+<div class="content">
+  <h2>Executive Summary</h2>
+  <p class="dropcap">
+    In a single session, we constructed a working pipeline where natural language typed into an LLM 
+    is translated into real-time robot commands across multiple physics simulators. The pipeline 
+    chains Claude Code (via Anthropic's Claude) through the Model Context Protocol (MCP) to a 
+    ROS2 bridge, which dispatches commands to both a Gazebo mobile robot and a MuJoCo robotic arm 
+    — simultaneously. NVIDIA Isaac Sim was installed but encountered compatibility issues on 
+    Ubuntu 24.04.
+  </p>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-number">2</div>
+      <div class="stat-label">Simulators Connected</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">13+</div>
+      <div class="stat-label">Live ROS2 Topics</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">1</div>
+      <div class="stat-label">MCP Pipeline</div>
+    </div>
+  </div>
+
+  <div class="pipeline">
+    <div class="pipeline-title">The Working Pipeline</div>
+    <div class="pipeline-flow">
+      <span class="pipeline-node node-llm">Claude Code</span>
+      <span class="pipeline-arrow">→</span>
+      <span class="pipeline-node node-mcp">MCP Server</span>
+      <span class="pipeline-arrow">→</span>
+      <span class="pipeline-node node-ros">rosbridge (9090)</span>
+      <span class="pipeline-arrow">→</span>
+      <span class="pipeline-node node-sim">ROS2 Jazzy</span>
+      <span class="pipeline-arrow">→</span>
+      <span class="pipeline-node node-sim">Gazebo / MuJoCo</span>
+    </div>
+  </div>
+
+  <div class="section-break">· · ·</div>
+
+  <!-- ==================== THE JOURNEY ==================== -->
+  <h2>The Build Journey</h2>
+  <p>
+    What follows is a chronological account of every step taken — the installations that 
+    succeeded on the first try, the ones that required debugging, and the walls we hit. 
+    Each step is marked with its outcome.
+  </p>
+
+  <h3>Phase 1 — ROS2 Foundation</h3>
+  <p>
+    The first challenge: Ubuntu 24.04 (Noble) ships with Python 3.12 and is not compatible 
+    with ROS2 Humble (which targets Ubuntu 22.04). The pivot to <strong>ROS2 Jazzy</strong> 
+    was the correct call and resolved the distribution mismatch.
+  </p>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-dot dot-fail"></div>
+      <div class="timeline-title">curl not found</div>
+      <div class="timeline-detail">Ubuntu 24.04 minimal doesn't include curl. Quick fix.</div>
+      <code class="timeline-cmd">sudo apt install -y curl</code>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot dot-fail"></div>
+      <div class="timeline-title">ROS2 Humble incompatible with Ubuntu 24.04</div>
+      <div class="timeline-detail">GPG key errors and missing packages. Humble targets Jammy (22.04), not Noble (24.04). Pivoted to ROS2 Jazzy.</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot dot-success"></div>
+      <div class="timeline-title">ROS2 Jazzy installed successfully</div>
+      <div class="timeline-detail">Full desktop install completed. <code>ros2 --help</code> confirmed working.</div>
+      <code class="timeline-cmd">sudo apt install -y ros-jazzy-desktop</code>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot dot-fail"></div>
+      <div class="timeline-title">TurtleBot3 packages installed but not found</div>
+      <div class="timeline-detail">Initial <code>apt install</code> with the gazebo-ros-pkgs glob failed, rolling back turtlebot3 packages silently. Had to install them separately.</div>
+      <code class="timeline-cmd">sudo apt install -y ros-jazzy-turtlebot3 ros-jazzy-turtlebot3-gazebo ros-jazzy-turtlebot3-teleop ros-jazzy-turtlebot3-msgs ros-jazzy-turtlebot3-description ros-jazzy-turtlebot3-simulations ros-jazzy-turtlebot3-bringup ros-jazzy-turtlebot3-navigation2</code>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot dot-success"></div>
+      <div class="timeline-title">Gazebo + TurtleBot3 launched</div>
+      <video class="phase-video" controls preload="metadata">
+        <source src="g.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+      <div class="timeline-detail">Gazebo Harmonic window opened with TurtleBot3 burger model. 13 ROS2 topics visible including /cmd_vel, /scan, /odom, /imu.</div>
+      <code class="timeline-cmd">export TURTLEBOT3_MODEL=burger<br>ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py</code>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot dot-success"></div>
+      <div class="timeline-title">rosbridge WebSocket server running</div>
+      <div class="timeline-detail">WebSocket bridge on port 9090 — the connector between MCP and ROS2.</div>
+      <code class="timeline-cmd">sudo apt install -y ros-jazzy-rosbridge-server<br>ros2 launch rosbridge_server rosbridge_websocket_launch.xml</code>
+    </div>
+  </div>
+
+  <div class="section-break">· · ·</div>
+
+  <h3>Phase 2 — MCP Server + Claude Code</h3>
+  <p>
+    The ROS MCP Server by robotmcp is the bridge that translates LLM tool calls into 
+    ROS2 WebSocket commands. Getting it running required navigating a project that had 
+    recently restructured from a flat script to a proper Python package.
+  </p>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-dot dot-success"></div>
+      <div class="timeline-title">ros-mcp-server cloned and installed</div>
+      <div class="timeline-detail">The project uses pyproject.toml (no requirements.txt). Installed with <code>uv pip install -e .</code></div>
+      <code class="timeline-cmd">git clone https://github.com/robotmcp/ros-mcp-server.git<br>cd ros-mcp-server && uv venv && source .venv/bin/activate<br>uv pip install -e .</code>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot dot-fail"></div>
+      <div class="timeline-title">Claude Code install URL wrong</div>
+      <div class="timeline-detail"><code>cli.claude.com</code> doesn't exist. Correct URL is <code>claude.ai/install.sh</code>.</div>
+      <code class="timeline-cmd">curl -fsSL https://claude.ai/install.sh | bash</code>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot dot-success"></div>
+      <div class="timeline-title">Claude Code installed and authenticated</div>
+      <div class="timeline-detail">Native binary installer, no Node.js required.</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot dot-success"></div>
+      <div class="timeline-title">MCP server connected to Claude Code</div>
+      <div class="timeline-detail">Claude can now list all ROS topics, publish velocity commands, subscribe to sensor data.</div>
+      <code class="timeline-cmd">claude mcp add ros-mcp-server uv -- --directory /home/pavan-kumar/ros-mcp-server run server.py</code>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot dot-success"></div>
+      <div class="timeline-title">First LLM → Robot command executed</div>
+      <div class="timeline-detail">Asked Claude "What ROS topics are available?" — it returned all 13 topics with types. The full pipeline was live.</div>
+    </div>
+  </div>
+
+  <div class="pull-quote">
+    "What ROS topics are available?" — a natural language question that traverses 
+    Claude Code → MCP → WebSocket → ROS2 and returns live robot data.
+  </div>
+
+  <div class="section-break">· · ·</div>
+
+  <h3>Phase 3 — MuJoCo Robotic Arm</h3>
+  <video class="phase-video" controls preload="metadata">
+    <source src="m.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+  <p>
+    To demonstrate multi-simulator control, we added a MuJoCo-based 3-DOF robotic arm 
+    that publishes to ROS2 topics. This meant Claude could control two entirely different 
+    robots through the same MCP connection.
+  </p>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-dot dot-success"></div>
+      <div class="timeline-title">MuJoCo 3.5.0 installed</div>
+      <div class="timeline-detail">Clean pip install, no issues.</div>
+      <code class="timeline-cmd">pip install mujoco --break-system-packages</code>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot dot-fail"></div>
+      <div class="timeline-title">mujoco_ros2_control failed to build</div>
+      <div class="timeline-detail">C++ API incompatibility — the ResourceManager constructor changed in Jazzy's ros2_control. The community package hasn't been updated.</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot dot-success"></div>
+      <div class="timeline-title">Custom Python bridge created</div>
+      <div class="timeline-detail">Wrote a Python node that runs MuJoCo simulation headlessly and publishes /mujoco/joint_states, /mujoco/end_effector_pos, subscribes to /mujoco/joint_commands.</div>
+      <code class="timeline-cmd">python3 ~/mujoco_ros_bridge.py</code>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot dot-fail"></div>
+      <div class="timeline-title">MuJoCo viewer crashed with segfault</div>
+      <div class="timeline-detail">Thread-safety issue when viewer and ROS2 spin access MjData simultaneously. <code>mujoco.viewer.launch()</code> is not thread-safe.</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot dot-success"></div>
+      <div class="timeline-title">Fixed with launch_passive()</div>
+      <div class="timeline-detail">Switched to <code>mujoco.viewer.launch_passive()</code> with <code>viewer.sync()</code> in the ROS spin loop. Arm now visible and controllable.</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot dot-success"></div>
+      <div class="timeline-title">Dual-simulator control achieved</div>
+      <div class="timeline-detail">Claude controlling TurtleBot3 in Gazebo AND the MuJoCo arm simultaneously through one MCP connection.</div>
+    </div>
+  </div>
+
+  <div class="section-break">· · ·</div>
+
+  <h3>Phase 4 — NVIDIA Isaac Sim (Attempted)</h3>
+  <p>
+    Isaac Sim represents the high end of robotics simulation — photorealistic rendering, 
+    GPU-accelerated physics, native ROS2 bridge. Getting it running on Ubuntu 24.04 with 
+    8GB VRAM proved challenging.
+  </p>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-dot dot-fail"></div>
+      <div class="timeline-title">Isaac Sim requires Python 3.11</div>
+      <div class="timeline-detail">Ubuntu 24.04 ships Python 3.12. Had to install Python 3.11 and create a separate venv.</div>
+      <code class="timeline-cmd">sudo apt install -y python3.11 python3.11-venv<br>python3.11 -m venv ~/isaac_env</code>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot dot-success"></div>
+      <div class="timeline-title">Isaac Sim 5.1 pip install succeeded</div>
+      <div class="timeline-detail">EULA accepted, base package imported successfully.</div>
+      <code class="timeline-cmd">pip install isaacsim<br>pip install "isaacsim[all,extscache]" --extra-index-url https://pypi.nvidia.com</code>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot dot-partial"></div>
+      <div class="timeline-title">Isaac Sim GUI opened but unstable</div>
+      <div class="timeline-detail">Application launched via <code>isaacsim isaacsim.exp.full.kit</code> but kept closing. SimulationApp Python API returned NoneType. RTX 2000 Ada (8GB VRAM) at minimum spec threshold.</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot dot-fail"></div>
+      <div class="timeline-title">ROS2 bridge not loading</div>
+      <div class="timeline-detail">No <code>isaacsim-ros2-bridge</code> pip package available. The <code>--enable isaacsim.ros2.bridge</code> flag didn't produce ROS2 topics. Ubuntu 24.04 is not fully supported by Isaac Sim.</div>
+    </div>
+  </div>
+
+  <div class="section-break">· · ·</div>
+
+  <!-- ==================== FINAL STATUS ==================== -->
+  <h2>Final Status Matrix</h2>
+</div>
+
+<div class="wide">
+  <table class="status-table">
+    <thead>
+      <tr>
+        <th>Component</th>
+        <th>Status</th>
+        <th>Version</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>ROS2 Jazzy</strong></td>
+        <td><span class="badge badge-success">Working</span></td>
+        <td>Jazzy Jalisco</td>
+        <td>Full desktop install on Ubuntu 24.04 Noble</td>
+      </tr>
+      <tr>
+        <td><strong>Gazebo + TurtleBot3</strong></td>
+        <td><span class="badge badge-success">Working</span></td>
+        <td>Harmonic</td>
+        <td>Mobile robot with LiDAR, IMU, odometry — all controllable via Claude</td>
+      </tr>
+      <tr>
+        <td><strong>rosbridge</strong></td>
+        <td><span class="badge badge-success">Working</span></td>
+        <td>Port 9090</td>
+        <td>WebSocket bridge between MCP server and ROS2</td>
+      </tr>
+      <tr>
+        <td><strong>ROS MCP Server</strong></td>
+        <td><span class="badge badge-success">Working</span></td>
+        <td>3.0.1</td>
+        <td>robotmcp/ros-mcp-server — FastMCP-based, stdio transport</td>
+      </tr>
+      <tr>
+        <td><strong>Claude Code</strong></td>
+        <td><span class="badge badge-success">Working</span></td>
+        <td>Native installer</td>
+        <td>LLM client with MCP support on Linux</td>
+      </tr>
+      <tr>
+        <td><strong>MuJoCo</strong></td>
+        <td><span class="badge badge-success">Working</span></td>
+        <td>3.5.0</td>
+        <td>3-DOF arm via custom Python-ROS2 bridge with passive viewer</td>
+      </tr>
+      <tr>
+        <td><strong>mujoco_ros2_control</strong></td>
+        <td><span class="badge badge-fail">Failed</span></td>
+        <td>—</td>
+        <td>C++ API mismatch with Jazzy's ros2_control ResourceManager</td>
+      </tr>
+      <tr>
+        <td><strong>NVIDIA Isaac Sim</strong></td>
+        <td><span class="badge badge-partial">Partial</span></td>
+        <td>5.1.0</td>
+        <td>Installed, GUI opens but unstable. ROS2 bridge not functional. Ubuntu 24.04 not fully supported, 8GB VRAM at minimum threshold.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="content">
+
+  <div class="section-break">· · ·</div>
+
+  <!-- ==================== ARCHITECTURE ==================== -->
+  <h2>Working Architecture</h2>
+  <p>
+    The final architecture requires four simultaneous terminal sessions. The LLM never 
+    directly touches ROS2 — it operates through a clean abstraction layer of MCP tools 
+    that translate intent into action.
+  </p>
+
+  <div class="code-block">
+<span class="comment"># Terminal 1 — Gazebo Simulation</span>
+<span class="cmd">source /opt/ros/jazzy/setup.bash
+export TURTLEBOT3_MODEL=burger
+ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py</span>
+
+<span class="comment"># Terminal 2 — rosbridge WebSocket</span>
+<span class="cmd">source /opt/ros/jazzy/setup.bash
+ros2 launch rosbridge_server rosbridge_websocket_launch.xml</span>
+
+<span class="comment"># Terminal 3 — MuJoCo Arm</span>
+<span class="cmd">source /opt/ros/jazzy/setup.bash
+python3 ~/mujoco_ros_bridge.py</span>
+
+<span class="comment"># Terminal 4 — Claude Code with MCP</span>
+<span class="cmd">cd ~/ros-mcp-server
+claude</span>
+  </div>
+
+  <div class="section-break">· · ·</div>
+
+  <!-- ==================== CONSTRAINTS ==================== -->
+  <h2>Constraints & Limitations</h2>
+
+  <div class="constraint-box">
+    <h4>Hardware & Platform Constraints</h4>
+    <ul>
+      <li>Ubuntu 24.04 (Noble) is too new for many robotics packages — ROS2 Humble, Isaac Sim, and mujoco_ros2_control all target 22.04</li>
+      <li>RTX 2000 Ada with 8GB VRAM is at minimum spec for Isaac Sim — complex scenes require 16GB+</li>
+      <li>No official Claude Desktop for Linux — used Claude Code CLI as the MCP client instead</li>
+      <li>MuJoCo viewer thread-safety requires launch_passive() pattern, not launch()</li>
+    </ul>
+  </div>
+
+  <div class="constraint-box">
+    <h4>Software Ecosystem Constraints</h4>
+    <ul>
+      <li>Isaac Sim 5.1 pip package requires Python 3.11 exactly — not 3.10, not 3.12</li>
+      <li>The mujoco_ros2_control C++ package hasn't been updated for Jazzy's ros2_control API changes</li>
+      <li>Isaac Sim ROS2 bridge has no standalone pip package — tightly coupled to the Omniverse runtime</li>
+      <li>rosbridge is the single point of failure — all MCP-to-ROS communication flows through one WebSocket</li>
+    </ul>
+  </div>
+
+  <div class="section-break">· · ·</div>
+
+  <!-- ==================== POSSIBILITIES ==================== -->
+  <h2>What This Makes Possible</h2>
+
+  <div class="possibility-box">
+    <h4>Immediate Capabilities (Working Today)</h4>
+    <ul>
+      <li>Natural language control of a mobile robot — "move forward 1 meter, turn left 90 degrees"</li>
+      <li>Natural language control of a robotic arm — "set shoulder to 1.5 radians"</li>
+      <li>Real-time sensor reading via conversation — "what does the LiDAR see?"</li>
+      <li>Multi-robot orchestration — control Gazebo and MuJoCo robots simultaneously</li>
+      <li>Robot debugging via natural language — browse topics, inspect message types, call services</li>
+    </ul>
+  </div>
+
+  <div class="possibility-box">
+    <h4>Near-Term Extensions</h4>
+    <ul>
+      <li>Voice-controlled robotics — pipe speech-to-text into Claude Code</li>
+      <li>Vision-language robot reasoning — subscribe to camera topics, send frames to VLMs</li>
+      <li>Multi-step autonomous task planning — LLM decomposes "explore the room" into sensor reads and motor commands</li>
+      <li>Anomaly detection — LLM monitors sensor streams and alerts on unusual readings</li>
+      <li>Add Blender MCP for 3D environment design + Home Assistant MCP for smart device integration</li>
+    </ul>
+  </div>
+
+  <div class="pull-quote">
+    Two different robots, two different physics engines, one natural language interface. 
+    The protocol layer — MCP — is what makes this composable.
+  </div>
+
+  <div class="section-break">· · ·</div>
+
+  <!-- ==================== KEY TAKEAWAYS ==================== -->
+  <h2>Key Takeaways</h2>
+
+  <p>
+    <strong>1. The MCP abstraction is powerful.</strong> By placing an MCP server between the LLM and ROS2, 
+    we decouple the intelligence layer from the robot layer. Any MCP-compatible LLM (Claude, GPT, Gemini) 
+    can control any ROS robot without modification.
+  </p>
+
+  <p>
+    <strong>2. Ubuntu 22.04 is still the safe bet for robotics.</strong> Every compatibility issue we hit 
+    — ROS2 Humble, Isaac Sim, mujoco_ros2_control — traces back to being on 24.04. The ecosystem hasn't 
+    fully migrated yet.
+  </p>
+
+  <p>
+    <strong>3. Python bridges beat C++ packages for rapid prototyping.</strong> When the compiled 
+    mujoco_ros2_control package failed, a 90-line Python script achieved the same result in minutes. 
+    For LLM-driven robotics, the speed of iteration matters more than the speed of execution.
+  </p>
+
+  <p>
+    <strong>4. The ecosystem is nascent but accelerating.</strong> The ros-mcp-server project went from 
+    first release in September 2025 to 825+ GitHub stars by March 2026. Research papers on "Agentic 
+    Embodied AI" via MCP are appearing monthly. This is early, but the direction is clear.
+  </p>
+
+  <div class="section-break">· · ·</div>
+
+  <h2>Hardware Used</h2>
+  <table class="status-table">
+    <thead>
+      <tr><th>Component</th><th>Specification</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Machine</td><td>HP ZBook Power 16 inch G11 Mobile Workstation</td></tr>
+      <tr><td>GPU</td><td>NVIDIA RTX 2000 Ada Generation — 8GB VRAM</td></tr>
+      <tr><td>Driver</td><td>NVIDIA 580.95.05 — CUDA 13.0</td></tr>
+      <tr><td>OS</td><td>Ubuntu 24.04 LTS (Noble Numbat)</td></tr>
+      <tr><td>ROS2</td><td>Jazzy Jalisco</td></tr>
+      <tr><td>Python</td><td>3.12 (system) + 3.11 (Isaac Sim venv)</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<footer class="footer">
+  <p>Built during a single exploratory session &nbsp;·&nbsp; March 9–10, 2026</p>
+  <p style="margin-top:0.5rem;">LLM → MCP → ROS2 → Robot</p>
+</footer>
+
+</body>
+</html>
