@@ -43,10 +43,7 @@ Phase 2 now embeds the local demo recordings already checked into this repo:
 - `g.webm` / `g.mp4` - Gazebo TurtleBot3 demo
 - `m.webm` / `m.mp4` - MuJoCo robotic arm demo
 - `m-multi.webm` / `m-multi.mp4` - MuJoCo multi-arm demo
-
-One placeholder is intentionally left in the datastory page for the next recording you plan to add:
-
-- PyBullet multi-arm placement video
+- `py-bullet.webm` / `py-bullet.mp4` - PyBullet multi-arm demo
 
 ---
 

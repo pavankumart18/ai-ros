@@ -1088,12 +1088,15 @@ body {
       </div>
     </div>
 
-    <div class="video-slot placeholder fade-in">
-      <div class="video-icon"></div>
-      <div class="video-placeholder-kicker">Awaiting Recording</div>
+    <div class="video-slot has-video fade-in">
+      <video class="phase-video" controls preload="metadata" playsinline>
+        <source src="py-bullet.webm" type="video/webm">
+        <source src="py-bullet.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
       <div class="video-caption">
         <div class="video-label">PyBullet Multi-Arm Demo</div>
-        <div class="video-sub">Block pick works / box placement tuning / recording pending</div>
+        <div class="video-sub">Block pick works, with box placement still being tuned in the PyBullet stage</div>
       </div>
     </div>
 
