@@ -25,6 +25,29 @@ NVIDIA Isaac Sim was installed but encountered compatibility issues on Ubuntu 24
 Claude Code → MCP Server → rosbridge (9090) → ROS2 Jazzy → Gazebo / MuJoCo
 ```
 
+## Project Pages
+
+This repo now has two browser-facing project pages:
+
+| Phase | File | Purpose |
+|------|------|---------|
+| Phase 1 | [`index.html`](index.html) | Discovery report and technical narrative |
+| Phase 2 | [`robotics-ai-datastory.html`](robotics-ai-datastory.html) | Datastory version with the expanded visual walkthrough |
+
+Both HTML pages now include a top phase toggle so you can switch between Phase 1 and Phase 2 in the browser.
+
+### Demo Media In The Repo
+
+Phase 2 now embeds the local demo recordings already checked into this repo:
+
+- `g.webm` / `g.mp4` - Gazebo TurtleBot3 demo
+- `m.webm` / `m.mp4` - MuJoCo robotic arm demo
+- `m-multi.webm` / `m-multi.mp4` - MuJoCo multi-arm demo
+
+One placeholder is intentionally left in the datastory page for the next recording you plan to add:
+
+- PyBullet multi-arm placement video
+
 ---
 
 ## The Build Journey

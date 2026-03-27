@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 2 - When Language Learned to Move</title>
+<link href="https://fonts.googleapis.com/css2?family=Freight+Display+Pro:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f8f7f4;
+  --ink: #1b1b1b;
+  --red: #d63031;
+  --blue: #0984e3;
+  --green: #00b894;
+  --amber: #fdcb6e;
+  --muted: #636e72;
+  --light-border: #dfe6e9;
+  --card-bg: #ffffff;
+  --dark-bg: #0c1021;
+  --dark-surface: #151a30;
+  --code-bg: #1e1e2e;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.75;
+  font-size: 17px;
+  overflow-x: hidden;
+}
+
+.phase-switch-shell {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 50;
+}
+
+.phase-switch {
+  width: min(320px, calc(100vw - 2rem));
+  margin: 0;
+  padding: 0.28rem;
+  border-radius: 18px;
+  background: rgba(12,16,33,0.82);
+  border: 1px solid rgba(255,255,255,0.12);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 12px 28px rgba(12,16,33,0.18);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.22rem;
+}
+
+.phase-switch a {
+  color: rgba(255,255,255,0.78);
+  text-decoration: none;
+  font-size: 0.76rem;
+  font-weight: 600;
+  padding: 0.5rem 0.7rem;
+  border-radius: 14px;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.phase-switch a:hover {
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.phase-switch a.is-active {
+  background: #fff;
+  color: var(--dark-bg);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+}
+
+/* ============================================= */
+/* HERO                                          */
+/* ============================================= */
+.hero {
+  min-height: 100vh;
+  background: var(--dark-bg);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 6rem 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(9,132,227,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 20% 80%, rgba(214,48,49,0.08) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 40% at 80% 70%, rgba(0,184,148,0.08) 0%, transparent 50%);
+}
+
+.hero-eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 2.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(3rem, 7vw, 5.5rem);
+  font-weight: 900;
+  color: #fff;
+  line-height: 1.05;
+  max-width: 800px;
+  position: relative;
+  z-index: 1;
+  margin-bottom: 1.5rem;
+}
+
+.hero h1 em {
+  font-style: italic;
+  color: var(--blue);
+}
+
+.hero-deck {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 300;
+  color: rgba(255,255,255,0.55);
+  max-width: 580px;
+  position: relative;
+  z-index: 1;
+  line-height: 1.7;
+}
+
+.hero-scroll {
+  position: absolute;
+  bottom: 3rem;
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(255,255,255,0.25);
+  font-size: 0.75rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  animation: pulse 2s ease infinite;
+  z-index: 1;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 0.6; }
+}
+
+/* ============================================= */
+/* CONTENT                                       */
+/* ============================================= */
+.article {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 5rem 2rem;
+}
+
+.article p {
+  margin-bottom: 1.6rem;
+  font-size: 1.05rem;
+  color: #2d3436;
+}
+
+.article h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.4rem;
+  font-weight: 700;
+  margin-top: 5rem;
+  margin-bottom: 0.5rem;
+  color: var(--ink);
+  line-height: 1.15;
+}
+
+.article h2 + .h2-rule {
+  width: 60px;
+  height: 3px;
+  background: var(--red);
+  margin-bottom: 2rem;
+}
+
+.article h3 {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-top: 3rem;
+  margin-bottom: 1rem;
+  color: var(--ink);
+}
+
+.lede {
+  font-size: 1.25rem;
+  font-weight: 300;
+  line-height: 1.8;
+  color: #2d3436;
+  border-left: 3px solid var(--blue);
+  padding-left: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+/* ============================================= */
+/* SCROLLY NUMBERS (McKinsey style)              */
+/* ============================================= */
+.big-numbers {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  margin: 4rem -2rem;
+  border-top: 1px solid var(--light-border);
+  border-bottom: 1px solid var(--light-border);
+}
+
+.big-num {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  border-right: 1px solid var(--light-border);
+}
+
+.big-num:last-child { border-right: none; }
+
+.big-num-val {
+  font-family: 'Playfair Display', serif;
+  font-size: 3.2rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.big-num-val.c-red { color: var(--red); }
+.big-num-val.c-blue { color: var(--blue); }
+.big-num-val.c-green { color: var(--green); }
+.big-num-val.c-amber { color: #e17055; }
+
+.big-num-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 0.6rem;
+}
+
+/* ============================================= */
+/* PIPELINE DIAGRAM                              */
+/* ============================================= */
+.pipeline-section {
+  background: var(--dark-bg);
+  width: 100vw;
+  margin: 4rem calc(50% - 50vw);
+  padding: 4rem 2rem;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+.pipeline-inner {
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+  text-align: center;
+}
+
+.pipeline-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.pipeline-chain {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.p-node {
+  padding: 0.8rem 1.4rem;
+  border-radius: 4px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.p-node.n1 { background: rgba(108,92,231,0.2); color: #a29bfe; border: 1px solid rgba(108,92,231,0.3); }
+.p-node.n2 { background: rgba(253,203,110,0.15); color: #ffeaa7; border: 1px solid rgba(253,203,110,0.25); }
+.p-node.n3 { background: rgba(0,184,148,0.15); color: #55efc4; border: 1px solid rgba(0,184,148,0.25); }
+.p-node.n4 { background: rgba(9,132,227,0.15); color: #74b9ff; border: 1px solid rgba(9,132,227,0.25); }
+
+.p-arrow { color: rgba(255,255,255,0.2); font-size: 1.3rem; }
+
+.pipeline-caption {
+  text-align: center;
+  color: rgba(255,255,255,0.35);
+  font-size: 0.85rem;
+  margin-top: 1.5rem;
+  font-style: italic;
+}
+
+/* ============================================= */
+/* JOURNEY TIMELINE                              */
+/* ============================================= */
+.journey {
+  margin: 3rem 0;
+}
+
+.phase-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 3rem;
+  margin-bottom: 1.5rem;
+}
+
+.phase-num {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.phase-num.ph1 { background: var(--blue); }
+.phase-num.ph2 { background: var(--green); }
+.phase-num.ph3 { background: var(--red); }
+.phase-num.ph4 { background: #e17055; }
+.phase-num.ph5 { background: #6c5ce7; }
+
+.phase-name {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.step {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 0;
+  margin-bottom: 0;
+  border-bottom: 1px solid #f0eeeb;
+  padding: 1rem 0;
+}
+
+.step:last-child { border-bottom: none; }
+
+.step-status {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 0.2rem;
+}
+
+.badge {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 0.25rem 0.6rem;
+  border-radius: 2px;
+}
+
+.badge-ok { background: #d5f5e3; color: #00b894; }
+.badge-fail { background: #fab1a0; color: #d63031; }
+.badge-warn { background: #ffeaa7; color: #e17055; }
+
+.step-content h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.step-content p {
+  font-size: 0.88rem;
+  color: var(--muted);
+  margin-bottom: 0.4rem;
+  line-height: 1.5;
+}
+
+.step-cmd {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.75rem;
+  background: var(--code-bg);
+  color: #ccc;
+  padding: 0.5rem 0.75rem;
+  border-radius: 3px;
+  margin-top: 0.4rem;
+  overflow-x: auto;
+  display: inline-block;
+}
+
+/* ============================================= */
+/* DISCOVERY CALLOUT                             */
+/* ============================================= */
+.discovery {
+  background: linear-gradient(135deg, #0c1021 0%, #1a1a3e 100%);
+  border-radius: 6px;
+  padding: 2.5rem;
+  margin: 3rem 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.discovery::before {
+  content: 'DISCOVERY';
+  position: absolute;
+  top: 1rem;
+  right: 1.5rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 3px;
+  color: var(--amber);
+  opacity: 0.7;
+}
+
+.discovery p {
+  color: rgba(255,255,255,0.85);
+  font-size: 1.05rem;
+  font-style: italic;
+  line-height: 1.7;
+}
+
+.discovery .attribution {
+  color: rgba(255,255,255,0.4);
+  font-size: 0.8rem;
+  margin-top: 1rem;
+  font-style: normal;
+}
+
+/* ============================================= */
+/* STATUS MATRIX                                 */
+/* ============================================= */
+.matrix-wrap {
+  margin: 3rem -2rem;
+  overflow-x: auto;
+}
+
+.matrix {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  min-width: 600px;
+}
+
+.matrix thead th {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: left;
+  padding: 1rem;
+  border-bottom: 2px solid var(--ink);
+}
+
+.matrix tbody td {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid #f0eeeb;
+  vertical-align: top;
+}
+
+.matrix tbody tr:hover { background: rgba(9,132,227,0.03); }
+
+/* ============================================= */
+/* VIDEO MODULE                                  */
+/* ============================================= */
+.video-slot {
+  background: var(--dark-bg);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  margin: 2.5rem 0;
+  overflow: hidden;
+}
+
+.video-slot.has-video {
+  padding: 1rem;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.12);
+}
+
+.video-slot.placeholder {
+  padding: 3rem;
+  min-height: 200px;
+  text-align: center;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, rgba(21,26,48,0.98) 0%, rgba(12,16,33,0.98) 100%);
+}
+
+.phase-video {
+  display: block;
+  width: 100%;
+  border-radius: 6px;
+  background: #000;
+}
+
+.video-caption {
+  padding: 1rem 0.5rem 0.35rem;
+}
+
+.video-slot.placeholder .video-caption {
+  padding: 0;
+}
+
+.video-icon {
+  width: 60px;
+  height: 60px;
+  border: 2px solid rgba(255,255,255,0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  flex-shrink: 0;
+}
+
+.video-icon::after {
+  content: '';
+  width: 0;
+  height: 0;
+  border-left: 18px solid rgba(255,255,255,0.4);
+  border-top: 11px solid transparent;
+  border-bottom: 11px solid transparent;
+  margin-left: 4px;
+}
+
+.video-placeholder-kicker {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+  margin-bottom: 0.85rem;
+}
+
+.video-label {
+  color: rgba(255,255,255,0.82);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.video-slot.placeholder .video-label {
+  color: rgba(255,255,255,0.56);
+}
+
+.video-sub {
+  color: rgba(255,255,255,0.5);
+  font-size: 0.8rem;
+  margin-top: 0.35rem;
+}
+
+.video-slot.placeholder .video-sub {
+  color: rgba(255,255,255,0.28);
+}
+
+/* ============================================= */
+/* QUOTE / PULLQUOTE                             */
+/* ============================================= */
+.pull {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  font-weight: 400;
+  font-style: italic;
+  line-height: 1.35;
+  color: var(--ink);
+  margin: 3.5rem 0;
+  padding: 0 1rem;
+  text-align: center;
+}
+
+.pull span {
+  color: var(--red);
+}
+
+/* ============================================= */
+/* CONSTRAINT / POSSIBILITY BOXES                */
+/* ============================================= */
+.insight-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin: 2.5rem 0;
+}
+
+.insight-box {
+  padding: 2rem;
+  border-radius: 4px;
+}
+
+.insight-box.constraints {
+  background: #fff5f5;
+  border: 1px solid #ffcccc;
+}
+
+.insight-box.possibilities {
+  background: #f0fff4;
+  border: 1px solid #c6f6d5;
+}
+
+.insight-box h4 {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.insight-box.constraints h4 { color: var(--red); }
+.insight-box.possibilities h4 { color: var(--green); }
+
+.insight-box ul {
+  list-style: none;
+  padding: 0;
+}
+
+.insight-box li {
+  font-size: 0.88rem;
+  padding: 0.4rem 0 0.4rem 1.2rem;
+  position: relative;
+  color: #555;
+  line-height: 1.5;
+}
+
+.insight-box.constraints li::before { content: '—'; position: absolute; left: 0; color: var(--red); }
+.insight-box.possibilities li::before { content: '+'; position: absolute; left: 0; color: var(--green); font-weight: 700; }
+
+/* ============================================= */
+/* HARDWARE STRIP                                */
+/* ============================================= */
+.hw-strip {
+  display: flex;
+  gap: 0;
+  margin: 3rem -2rem;
+  border-top: 1px solid var(--light-border);
+  border-bottom: 1px solid var(--light-border);
+  flex-wrap: wrap;
+}
+
+.hw-item {
+  flex: 1;
+  min-width: 120px;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  border-right: 1px solid var(--light-border);
+}
+
+.hw-item:last-child { border-right: none; }
+
+.hw-item .hw-val {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.hw-item .hw-key {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 0.3rem;
+}
+
+/* ============================================= */
+/* FOOTER                                        */
+/* ============================================= */
+.footer {
+  background: var(--dark-bg);
+  padding: 4rem 2rem;
+  text-align: center;
+  color: rgba(255,255,255,0.3);
+  font-size: 0.8rem;
+  line-height: 2;
+}
+
+.footer strong { color: rgba(255,255,255,0.6); }
+
+/* ============================================= */
+/* RESPONSIVE                                    */
+/* ============================================= */
+@media (max-width: 768px) {
+  .big-numbers { grid-template-columns: repeat(2, 1fr); }
+  .insight-grid { grid-template-columns: 1fr; }
+  .pipeline-chain { flex-direction: column; }
+  .p-arrow { transform: rotate(90deg); }
+  .hw-strip { flex-direction: column; }
+  .hw-item { border-right: none; border-bottom: 1px solid var(--light-border); }
+  .step { grid-template-columns: 60px 1fr; }
+  .phase-switch-shell {
+    top: 0.75rem;
+    right: 0.75rem;
+  }
+  .phase-switch {
+    width: min(290px, calc(100vw - 1.5rem));
+    border-radius: 16px;
+    padding: 0.24rem;
+  }
+  .phase-switch a {
+    font-size: 0.72rem;
+    padding: 0.46rem 0.45rem;
+  }
+  .video-slot.placeholder { padding: 2.25rem 1.5rem; }
+  .video-caption { padding: 0.85rem 0 0.2rem; }
+}
+
+/* Scroll animations */
+.fade-in {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+</style>
+</head>
+<body>
+
+<div class="phase-switch-shell">
+  <nav class="phase-switch" aria-label="Project phases">
+    <a href="index.html">Phase 1 / Discovery</a>
+    <a class="is-active" href="robotics-ai-datastory.html" aria-current="page">Phase 2 / Datastory</a>
+  </nav>
+</div>
+
+<!-- ===================== HERO ===================== -->
+<section class="hero">
+  <div class="hero-eyebrow">Phase 2 / Datastory / March 2026</div>
+  <h1>When Language<br>Learned to <em>Move</em></h1>
+  <p class="hero-deck">
+    A single-session experiment connecting Large Language Models to robotic simulators 
+    through the Model Context Protocol — from first install to dual-arm coordination.
+  </p>
+  <div class="hero-scroll">scroll to explore</div>
+</section>
+
+<!-- ===================== ARTICLE ===================== -->
+<div class="article">
+
+  <p class="lede">
+    What happens when you give an AI the ability to control physical machines through natural language? 
+    We built the pipeline — from Claude Code through MCP to ROS2, Gazebo, MuJoCo, and PyBullet — 
+    and discovered both the power and the friction of connecting language models to the physical world.
+  </p>
+
+  <!-- KEY METRICS -->
+  <div class="big-numbers fade-in">
+    <div class="big-num">
+      <div class="big-num-val c-blue">4</div>
+      <div class="big-num-label">Simulators Attempted</div>
+    </div>
+    <div class="big-num">
+      <div class="big-num-val c-green">3</div>
+      <div class="big-num-label">Successfully Connected</div>
+    </div>
+    <div class="big-num">
+      <div class="big-num-val c-red">16+</div>
+      <div class="big-num-label">ROS2 Topics Live</div>
+    </div>
+    <div class="big-num">
+      <div class="big-num-val c-amber">1</div>
+      <div class="big-num-label">Unified MCP Pipeline</div>
+    </div>
+  </div>
+
+  <!-- PIPELINE -->
+  <div class="pipeline-section">
+    <div class="pipeline-inner">
+      <div class="pipeline-title">The Architecture</div>
+      <div class="pipeline-chain">
+        <span class="p-node n1">Natural Language</span>
+        <span class="p-arrow">→</span>
+        <span class="p-node n1">Claude Code</span>
+        <span class="p-arrow">→</span>
+        <span class="p-node n2">MCP Server</span>
+        <span class="p-arrow">→</span>
+        <span class="p-node n3">rosbridge / PyBullet</span>
+        <span class="p-arrow">→</span>
+        <span class="p-node n4">Robot Simulator</span>
+      </div>
+      <div class="pipeline-caption">One sentence in, robot motion out. The protocol layer makes it composable.</div>
+    </div>
+  </div>
+
+  <h2>The Thesis</h2>
+  <div class="h2-rule"></div>
+
+  <p>
+    The Model Context Protocol (MCP) is Anthropic's open standard for connecting AI to external tools. 
+    ROS2 is the industry standard for robot communication. The hypothesis was simple: connect them, 
+    and you get natural language robot control with zero robot code changes.
+  </p>
+  <p>
+    The experiment spanned multiple sessions across March 2026, starting from a bare Ubuntu 24.04 
+    installation and ending with Claude orchestrating dual-arm block handoffs in simulation — 
+    reasoning about <em>why</em> it chose each action, not just executing commands.
+  </p>
+
+  <div class="pull">
+    "I chose handoff at x=-0.05 instead of center because the <span>loaded arm does more work</span> — 
+    shifting the point reduces its travel distance."
+    <br><small style="font-size:0.5em; font-style:normal; color:var(--muted);">— Claude's reasoning log during block handoff</small>
+  </div>
+
+  <!-- ===================== PHASE 1 ===================== -->
+  <h2>The Journey</h2>
+  <div class="h2-rule"></div>
+
+  <div class="journey">
+
+    <!-- PHASE 1 -->
+    <div class="phase-header fade-in">
+      <div class="phase-num ph1">1</div>
+      <div class="phase-name">ROS2 Foundation + Gazebo</div>
+    </div>
+
+    <div class="step fade-in">
+      <div class="step-status"><span class="badge badge-fail">fail</span></div>
+      <div class="step-content">
+        <h4>ROS2 Humble incompatible with Ubuntu 24.04</h4>
+        <p>Humble targets Jammy (22.04). GPG key errors on Noble. Pivoted to ROS2 Jazzy.</p>
+      </div>
+    </div>
+
+    <div class="step fade-in">
+      <div class="step-status"><span class="badge badge-ok">ok</span></div>
+      <div class="step-content">
+        <h4>ROS2 Jazzy installed</h4>
+        <p>Full desktop install on Ubuntu 24.04. All core tools working.</p>
+        <code class="step-cmd">sudo apt install -y ros-jazzy-desktop</code>
+      </div>
+    </div>
+
+    <div class="step fade-in">
+      <div class="step-status"><span class="badge badge-fail">fail</span></div>
+      <div class="step-content">
+        <h4>TurtleBot3 packages silently rolled back</h4>
+        <p>Glob install with gazebo-ros-pkgs failed, taking turtlebot3 packages with it. Fixed by installing each package explicitly.</p>
+      </div>
+    </div>
+
+    <div class="step fade-in">
+      <div class="step-status"><span class="badge badge-ok">ok</span></div>
+      <div class="step-content">
+        <h4>Gazebo Harmonic + TurtleBot3 launched</h4>
+        <p>Mobile robot visible in simulation. 13 ROS2 topics active: /cmd_vel, /scan, /odom, /imu, /joint_states.</p>
+        <code class="step-cmd">ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py</code>
+      </div>
+    </div>
+
+    <div class="step fade-in">
+      <div class="step-status"><span class="badge badge-warn">debug</span></div>
+      <div class="step-content">
+        <h4>Robot invisible in Gazebo — moved 1,443 meters offscreen</h4>
+        <p>Commands were publishing successfully but the robot had traveled far from camera view. Gazebo session wasn't restarting cleanly — background processes needed to be killed with pkill.</p>
+      </div>
+    </div>
+
+    <div class="step fade-in">
+      <div class="step-status"><span class="badge badge-ok">ok</span></div>
+      <div class="step-content">
+        <h4>Robot movement confirmed visible</h4>
+        <p>After clean restart with fresh clock (sec: 64), robot spinning and driving confirmed in Gazebo. TwistStamped messages working at 20Hz.</p>
+      </div>
+    </div>
+
+    <div class="video-slot has-video fade-in">
+      <video class="phase-video" controls preload="metadata" muted playsinline>
+        <source src="g.webm" type="video/webm">
+        <source src="g.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+      <div class="video-caption">
+        <div class="video-label">Gazebo TurtleBot3 Demo Recording</div>
+        <div class="video-sub">Claude Code controlling mobile robot via MCP -> ROS2</div>
+      </div>
+    </div>
+
+    <!-- PHASE 2 -->
+    <div class="phase-header fade-in">
+      <div class="phase-num ph2">2</div>
+      <div class="phase-name">MCP Bridge + Claude Code</div>
+    </div>
+
+    <div class="step fade-in">
+      <div class="step-status"><span class="badge badge-ok">ok</span></div>
+      <div class="step-content">
+        <h4>ros-mcp-server v3.0.1 installed</h4>
+        <p>FastMCP-based server by robotmcp. Translates LLM tool calls to ROS2 WebSocket commands via rosbridge on port 9090.</p>
+        <code class="step-cmd">git clone https://github.com/robotmcp/ros-mcp-server.git</code>
+      </div>
+    </div>
+
+    <div class="step fade-in">
+      <div class="step-status"><span class="badge badge-ok">ok</span></div>
+      <div class="step-content">
+        <h4>Claude Code connected via MCP</h4>
+        <p>Native installer on Linux. MCP server registered. First command: "What ROS topics are available?" returned all 13 topics with message types.</p>
+        <code class="step-cmd">claude mcp add ros-mcp-server uv -- --directory ~/ros-mcp-server run server.py</code>
+      </div>
+    </div>
+
+    <div class="discovery fade-in">
+      <p>"What ROS topics are available?" — a natural language question that traverses Claude Code → MCP → WebSocket → ROS2 and returns live robot data. The full pipeline, working.</p>
+      <div class="attribution">First successful LLM → Robot query</div>
+    </div>
+
+    <!-- PHASE 3 -->
+    <div class="phase-header fade-in">
+      <div class="phase-num ph3">3</div>
+      <div class="phase-name">MuJoCo Robotic Arm</div>
+    </div>
+
+    <div class="step fade-in">
+      <div class="step-status"><span class="badge badge-ok">ok</span></div>
+      <div class="step-content">
+        <h4>MuJoCo 3.5.0 installed</h4>
+        <p>Clean pip install. Physics engine running.</p>
+      </div>
+    </div>
+
+    <div class="step fade-in">
+      <div class="step-status"><span class="badge badge-fail">fail</span></div>
+      <div class="step-content">
+        <h4>mujoco_ros2_control C++ build failed</h4>
+        <p>ResourceManager constructor API changed in Jazzy's ros2_control. Community package not updated.</p>
+      </div>
+    </div>
+
+    <div class="step fade-in">
+      <div class="step-status"><span class="badge badge-ok">ok</span></div>
+      <div class="step-content">
+        <h4>Custom Python bridge: 90 lines replaced a C++ package</h4>
+        <p>Headless MuJoCo simulation publishing to ROS2 topics. Three new topics: /mujoco/joint_states, /mujoco/joint_commands, /mujoco/end_effector_pos.</p>
+      </div>
+    </div>
+
+    <div class="step fade-in">
+      <div class="step-status"><span class="badge badge-fail">fail</span></div>
+      <div class="step-content">
+        <h4>MuJoCo viewer segfault with threads</h4>
+        <p>mujoco.viewer.launch() is not thread-safe with ROS2 spin. Crashed after 2 seconds.</p>
+      </div>
+    </div>
+
+    <div class="step fade-in">
+      <div class="step-status"><span class="badge badge-ok">ok</span></div>
+      <div class="step-content">
+        <h4>Fixed with launch_passive() + viewer.sync()</h4>
+        <p>Thread-safe passive viewer. 3-DOF robotic arm visible and controllable via Claude through same MCP pipeline.</p>
+      </div>
+    </div>
+
+    <div class="step fade-in">
+      <div class="step-status"><span class="badge badge-ok">ok</span></div>
+      <div class="step-content">
+        <h4>Dual-simulator control achieved</h4>
+        <p>Claude controlling TurtleBot3 in Gazebo AND MuJoCo arm simultaneously through one MCP connection.</p>
+      </div>
+    </div>
+
+    <div class="video-slot has-video fade-in">
+      <video class="phase-video" controls preload="metadata" muted playsinline>
+        <source src="m.webm" type="video/webm">
+        <source src="m.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+      <div class="video-caption">
+        <div class="video-label">MuJoCo Robotic Arm Demo</div>
+        <div class="video-sub">Claude Code sending joint commands via MCP -> ROS2 -> MuJoCo</div>
+      </div>
+    </div>
+
+    <!-- PHASE 4 -->
+    <div class="phase-header fade-in">
+      <div class="phase-num ph4">4</div>
+      <div class="phase-name">NVIDIA Isaac Sim (Attempted)</div>
+    </div>
+
+    <div class="step fade-in">
+      <div class="step-status"><span class="badge badge-warn">partial</span></div>
+      <div class="step-content">
+        <h4>Isaac Sim 5.1 installed but unstable</h4>
+        <p>Required Python 3.11 (Ubuntu 24.04 ships 3.12). EULA accepted. GUI opened but kept crashing. SimulationApp API returned NoneType. 8GB VRAM at minimum threshold. ROS2 bridge not functional.</p>
+      </div>
+    </div>
+
+    <!-- PHASE 5 -->
+    <div class="phase-header fade-in">
+      <div class="phase-num ph5">5</div>
+      <div class="phase-name">Multi-Arm Coordination (MuJoCo + PyBullet)</div>
+    </div>
+
+    <div class="step fade-in">
+      <div class="step-status"><span class="badge badge-ok">ok</span></div>
+      <div class="step-content">
+        <h4>MuJoCo two-arm scene loaded</h4>
+        <p>Two 5-DOF arms with parallel-jaw grippers, table, 3 colored blocks (red/green/blue), handoff zone, target zone. Touch sensor XML errors fixed by removing broken references.</p>
+      </div>
+    </div>
+
+    <div class="step fade-in">
+      <div class="step-status"><span class="badge badge-ok">ok</span></div>
+      <div class="step-content">
+        <h4>MuJoCo local demo ran with AI reasoning</h4>
+        <p>Pre-scripted demo completed full pick → handoff → place sequence for all 3 blocks. Reasoning log showed non-obvious discoveries about handoff positioning and block ordering.</p>
+      </div>
+    </div>
+
+    <div class="step fade-in">
+      <div class="step-status"><span class="badge badge-ok">ok</span></div>
+      <div class="step-content">
+        <h4>FastMCP server connected to Claude Code</h4>
+        <p>Claude can observe scene, pick blocks, execute handoffs, place blocks — all through natural language. MuJoCo viewer open live alongside Claude Code.</p>
+      </div>
+    </div>
+
+    <div class="step fade-in">
+      <div class="step-status"><span class="badge badge-warn">partial</span></div>
+      <div class="step-content">
+        <h4>IK reaching issues in MuJoCo</h4>
+        <p>Arms move but don't reach exact block positions. Custom Jacobian-based IK not precise enough for reliable grasping. Commands report success but blocks not actually gripped.</p>
+      </div>
+    </div>
+
+    <div class="video-slot has-video fade-in">
+      <video class="phase-video" controls preload="metadata" muted playsinline>
+        <source src="m-multi.webm" type="video/webm">
+        <source src="m-multi.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+      <div class="video-caption">
+        <div class="video-label">MuJoCo Multi-Arm Demo</div>
+        <div class="video-sub">Multi-arm coordination attempt with MuJoCo before the PyBullet pivot</div>
+      </div>
+    </div>
+
+    <div class="step fade-in">
+      <div class="step-status"><span class="badge badge-ok">ok</span></div>
+      <div class="step-content">
+        <h4>Pivoted to PyBullet — built-in IK + Panda arms</h4>
+        <p>PyBullet's calculateInverseKinematics works out of the box with pre-built Franka Panda arm URDFs. Two arms facing each other, colored blocks on table, target box zone. Claude Code picks blocks via MCP.</p>
+      </div>
+    </div>
+
+    <div class="step fade-in">
+      <div class="step-status"><span class="badge badge-warn">partial</span></div>
+      <div class="step-content">
+        <h4>Pick works, placement in box still tuning</h4>
+        <p>Arm successfully picks blocks. Handoff and box placement need timing refinement — blocks slip during transfer. The coordination logic is correct; grip/release timing is the remaining challenge.</p>
+      </div>
+    </div>
+
+    <div class="video-slot placeholder fade-in">
+      <div class="video-icon"></div>
+      <div class="video-placeholder-kicker">Awaiting Recording</div>
+      <div class="video-caption">
+        <div class="video-label">PyBullet Multi-Arm Demo</div>
+        <div class="video-sub">Block pick works / box placement tuning / recording pending</div>
+      </div>
+    </div>
+
+  </div><!-- /journey -->
+
+  <!-- ===================== DISCOVERIES ===================== -->
+  <h2>What the AI Discovered</h2>
+  <div class="h2-rule"></div>
+
+  <p>
+    The most striking output wasn't the robot motion — it was the reasoning. When Claude orchestrated 
+    multi-block sorting, it generated non-obvious optimization insights that a human engineer might 
+    not have considered in a first pass.
+  </p>
+
+  <div class="discovery fade-in">
+    <p>"Picking block_green second (not block_blue) because block_blue's cylindrical shape might roll 
+    and knock into block_green, toppling it. Removing the tall, unstable block_green first reduces 
+    risk of cascade failures."</p>
+    <div class="attribution">Block ordering strategy — collision avoidance reasoning</div>
+  </div>
+
+  <div class="discovery fade-in">
+    <p>"Shifting handoff to y=0.05 for the rectangular block. This gives Arm B a better approach angle 
+    — approaching from the y-axis aligns the gripper with the block's wider face (4cm) rather than the 
+    narrow face, creating a more stable grasp."</p>
+    <div class="attribution">Shape-aware handoff positioning</div>
+  </div>
+
+  <div class="discovery fade-in">
+    <p>"For the cylinder, raising handoff height to z=0.57. Higher handoff reduces the chance of the 
+    cylinder slipping during transfer — gravity assists the receiving gripper's closure."</p>
+    <div class="attribution">Physics-aware transfer optimization</div>
+  </div>
+
+  <!-- ===================== STATUS MATRIX ===================== -->
+  <h2>Final Status</h2>
+  <div class="h2-rule"></div>
+
+  <div class="matrix-wrap">
+    <table class="matrix">
+      <thead>
+        <tr>
+          <th>Component</th>
+          <th>Status</th>
+          <th>Version</th>
+          <th>Key Insight</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>ROS2 Jazzy</strong></td>
+          <td><span class="badge badge-ok">working</span></td>
+          <td>Jazzy Jalisco</td>
+          <td>Use Jazzy for Ubuntu 24.04, not Humble</td>
+        </tr>
+        <tr>
+          <td><strong>Gazebo + TurtleBot3</strong></td>
+          <td><span class="badge badge-ok">working</span></td>
+          <td>Harmonic</td>
+          <td>Kill background gz processes between restarts</td>
+        </tr>
+        <tr>
+          <td><strong>rosbridge</strong></td>
+          <td><span class="badge badge-ok">working</span></td>
+          <td>Port 9090</td>
+          <td>Single point connecting MCP to ROS2</td>
+        </tr>
+        <tr>
+          <td><strong>ROS MCP Server</strong></td>
+          <td><span class="badge badge-ok">working</span></td>
+          <td>3.0.1</td>
+          <td>FastMCP + stdio transport to Claude Code</td>
+        </tr>
+        <tr>
+          <td><strong>Claude Code</strong></td>
+          <td><span class="badge badge-ok">working</span></td>
+          <td>v2.1.81</td>
+          <td>Native Linux installer, MCP client</td>
+        </tr>
+        <tr>
+          <td><strong>MuJoCo (single arm)</strong></td>
+          <td><span class="badge badge-ok">working</span></td>
+          <td>3.5.0</td>
+          <td>launch_passive() for thread-safe viewer</td>
+        </tr>
+        <tr>
+          <td><strong>MuJoCo (two-arm)</strong></td>
+          <td><span class="badge badge-warn">partial</span></td>
+          <td>3.5.0</td>
+          <td>Scene loads, reasoning works, IK imprecise</td>
+        </tr>
+        <tr>
+          <td><strong>PyBullet (two-arm)</strong></td>
+          <td><span class="badge badge-warn">partial</span></td>
+          <td>Latest</td>
+          <td>Built-in IK works, handoff timing needs tuning</td>
+        </tr>
+        <tr>
+          <td><strong>NVIDIA Isaac Sim</strong></td>
+          <td><span class="badge badge-fail">failed</span></td>
+          <td>5.1.0</td>
+          <td>Ubuntu 24.04 not supported, 8GB VRAM insufficient</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ===================== CONSTRAINTS + POSSIBILITIES ===================== -->
+  <h2>Constraints & Possibilities</h2>
+  <div class="h2-rule"></div>
+
+  <div class="insight-grid fade-in">
+    <div class="insight-box constraints">
+      <h4>Constraints Discovered</h4>
+      <ul>
+        <li>Ubuntu 24.04 is too new for most robotics packages — the ecosystem targets 22.04</li>
+        <li>RTX 2000 Ada (8GB VRAM) cannot run Isaac Sim reliably</li>
+        <li>No official Claude Desktop for Linux — CLI-only via Claude Code</li>
+        <li>MuJoCo's viewer is not thread-safe — requires launch_passive()</li>
+        <li>Custom IK solvers are unreliable — use simulators with built-in IK (PyBullet)</li>
+        <li>Isaac Sim requires exactly Python 3.11 — not 3.10, not 3.12</li>
+        <li>rosbridge is a single point of failure for the entire pipeline</li>
+      </ul>
+    </div>
+    <div class="insight-box possibilities">
+      <h4>What's Now Possible</h4>
+      <ul>
+        <li>Natural language robot control — "move forward, turn left, pick the red block"</li>
+        <li>Multi-robot orchestration through one LLM</li>
+        <li>AI reasoning about physical actions — not just executing, but explaining why</li>
+        <li>Any MCP-compatible LLM can control any ROS robot — zero code changes</li>
+        <li>Shape-aware and physics-aware manipulation strategies discovered by AI</li>
+        <li>Voice → LLM → MCP → Robot pipeline within reach</li>
+        <li>Add Blender MCP for 3D design + Home Assistant MCP for smart devices</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ===================== KEY TAKEAWAYS ===================== -->
+  <h2>Key Takeaways</h2>
+  <div class="h2-rule"></div>
+
+  <p>
+    <strong>1. The protocol layer is the breakthrough.</strong> MCP between the LLM and the simulator 
+    means any AI can control any robot. The intelligence and the hardware are fully decoupled. Today 
+    it's Claude; tomorrow it's any model.
+  </p>
+
+  <p>
+    <strong>2. Python bridges beat C++ packages for AI-driven robotics.</strong> When mujoco_ros2_control 
+    failed to compile, a 90-line Python script achieved the same result. When MuJoCo's IK was imprecise, 
+    PyBullet's built-in IK worked in one function call. Speed of iteration > speed of execution.
+  </p>
+
+  <p>
+    <strong>3. The reasoning log is more valuable than the motion.</strong> Anand's AlphaFold analogy 
+    applies: the environment isn't the breakthrough — what the AI discovers inside it is. When Claude 
+    explains "I pick the cube first because it's the most stable base for stacking," that's the 
+    moment a demo becomes a product.
+  </p>
+
+  <p>
+    <strong>4. Ubuntu 22.04 remains the safe bet.</strong> Every compatibility issue traced back to 
+    being on 24.04. For production robotics work, stay on 22.04 until the ecosystem catches up.
+  </p>
+
+  <div class="pull">
+    Two arms, three blocks, one language model. <br>
+    The robot doesn't just <span>move</span> — it <span>reasons</span>.
+  </div>
+
+  <!-- ===================== HARDWARE ===================== -->
+  <div class="hw-strip fade-in">
+    <div class="hw-item">
+      <div class="hw-val">HP ZBook Power G11</div>
+      <div class="hw-key">Machine</div>
+    </div>
+    <div class="hw-item">
+      <div class="hw-val">RTX 2000 Ada · 8GB</div>
+      <div class="hw-key">GPU</div>
+    </div>
+    <div class="hw-item">
+      <div class="hw-val">580.95.05</div>
+      <div class="hw-key">Driver</div>
+    </div>
+    <div class="hw-item">
+      <div class="hw-val">Ubuntu 24.04</div>
+      <div class="hw-key">OS</div>
+    </div>
+    <div class="hw-item">
+      <div class="hw-val">ROS2 Jazzy</div>
+      <div class="hw-key">Middleware</div>
+    </div>
+  </div>
+
+</div><!-- /article -->
+
+<footer class="footer">
+  <strong>Pavan Kumar</strong> · March 2026<br>
+  Built across multiple exploratory sessions<br>
+  LLM → MCP → Simulator → Robot Motion → AI Reasoning
+</footer>
+
+<script>
+// Scroll-triggered fade-in animations
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>

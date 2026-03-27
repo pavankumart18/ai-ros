@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bridging Language & Machines — An LLM-to-Robot Pipeline</title>
+<title>Phase 1 - Bridging Language & Machines</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -28,6 +28,52 @@
     color: var(--ink);
     line-height: 1.7;
     font-size: 18px;
+  }
+
+  .phase-switch-shell {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 50;
+  }
+
+  .phase-switch {
+    width: min(320px, calc(100vw - 2rem));
+    margin: 0;
+    padding: 0.28rem;
+    border-radius: 18px;
+    background: rgba(15, 19, 40, 0.8);
+    border: 1px solid rgba(255,255,255,0.14);
+    backdrop-filter: blur(18px);
+    box-shadow: 0 12px 28px rgba(12,16,35,0.18);
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.22rem;
+  }
+
+  .phase-switch a {
+    color: rgba(255,255,255,0.78);
+    text-decoration: none;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 0.76rem;
+    font-weight: 600;
+    padding: 0.5rem 0.7rem;
+    border-radius: 14px;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    white-space: nowrap;
+    text-align: center;
+  }
+
+  .phase-switch a:hover {
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+    transform: translateY(-1px);
+  }
+
+  .phase-switch a.is-active {
+    background: #fff;
+    color: var(--accent2);
+    box-shadow: 0 10px 24px rgba(0,0,0,0.18);
   }
 
   /* === HERO === */
@@ -471,14 +517,34 @@
     .pipeline-flow { flex-direction: column; }
     .pipeline-arrow { transform: rotate(90deg); }
     .content { padding: 2rem 1.25rem; }
+    .phase-switch-shell {
+      top: 0.75rem;
+      right: 0.75rem;
+    }
+    .phase-switch {
+      width: min(290px, calc(100vw - 1.5rem));
+      border-radius: 16px;
+      padding: 0.24rem;
+    }
+    .phase-switch a {
+      font-size: 0.72rem;
+      padding: 0.46rem 0.45rem;
+    }
   }
 </style>
 </head>
 <body>
 
+<div class="phase-switch-shell">
+  <nav class="phase-switch" aria-label="Project phases">
+    <a class="is-active" href="index.html" aria-current="page">Phase 1 / Discovery</a>
+    <a href="robotics-ai-datastory.html">Phase 2 / Datastory</a>
+  </nav>
+</div>
+
 <!-- ==================== HERO ==================== -->
 <section class="hero">
-  <div class="hero-label">Technical Exploration Report</div>
+  <div class="hero-label">Phase 1 / Technical Exploration Report</div>
   <h1>Bridging Language<br>& Machines</h1>
   <p class="hero-sub">
     An end-to-end experiment connecting Large Language Models to robotic simulators 
